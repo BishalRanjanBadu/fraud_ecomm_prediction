@@ -26,8 +26,8 @@ model through to a running endpoint that refuses to serve if the container canno
 
 | Phase | Scope | Status |
 |---|---|---|
-| **1 — Experimentation** | 7 notebooks, S3-chained stages, data contract, leakage audit, model card | **signed off 2026-09-17** |
-| **2 — Deployment** | `src/` package, 95 tests, ARM64 image, EKS, CI/CD, rollback drill | in progress |
+| **1 — Experimentation** | 7 notebooks, S3-chained stages, data contract, leakage audit, model card | **signed off** |
+| **2 — Deployment** | `src/` package, 95 tests, ARM64 image, EKS, CI/CD, rollback drill | **signed off** |
 | **3 — Operate & Monitor** | drift detection, label collection, automated retraining | not started |
 
 Every phase is gated by a recorded sign-off listing what was reviewed, what was accepted, and which deviations
