@@ -1,0 +1,23 @@
+# MARKER: fraud_phase2_v1
+# Raw landing data never enters git (the generator scripts, data dictionary and defect list do).
+1.RAW/*.csv
+!1.RAW/KNOWN_DEFECTS.csv
+1.RAW/*.parquet
+
+# local environments and caches
+.venv/
+**/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# secrets and local settings (credentials live in ~/.aws, never in the repo)
+.env
+**/.env
+
+# staging, runbook scratch files, rendered manifests, logs
+_incoming/
+3.DEPLOYMENT/_*
+_render/
+*.log

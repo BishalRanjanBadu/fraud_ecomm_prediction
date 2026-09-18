@@ -1,0 +1,17 @@
+# MARKER: fraud_phase2_v1
+# Windows checkouts must not turn shell scripts or container inputs into CRLF
+# (a CRLF entrypoint.sh fails inside the container with "bad interpreter").
+* text=auto
+*.sh        text eol=lf
+*.py        text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.json      text eol=lf
+*.md        text eol=lf
+*.txt       text eol=lf
+*.lock      text eol=lf
+*.ipynb     text eol=lf
+Dockerfile  text eol=lf
+.dockerignore text eol=lf
+*.parquet   binary
+*.pkl       binary

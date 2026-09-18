@@ -1,0 +1,7 @@
+# allow-list: the image needs only these
+*
+!src/
+!requirements.lock
+!entrypoint.sh
+**/__pycache__
+**/*.pyc

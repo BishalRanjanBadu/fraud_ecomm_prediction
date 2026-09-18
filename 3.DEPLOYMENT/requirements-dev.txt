@@ -1,0 +1,5 @@
+# Tests and operator scripts (local + CI test job). Not installed in the image.
+-r requirements.txt
+pyarrow==23.0.1
+httpx==0.28.1
+pytest==9.1.1

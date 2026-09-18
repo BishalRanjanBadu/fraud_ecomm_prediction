@@ -1,0 +1,226 @@
+# MARKER: fraud_phase2_v1
+# test (arm64, no cloud credentials) -> build (native arm64) + pin check + scan review -> deploy (render,
+# verify, apply, auto-rollback) -> post-deploy golden check through the load balancer.
+# CI never creates infrastructure: the cluster, OIDC provider and IRSA service account are one-time runbook steps.
+# Only two values are configured by hand (repo secrets): AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY.
+name: mlops-pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ["3.DEPLOYMENT/**", ".github/**"]
+  pull_request:
+    branches: [main]
+    paths: ["3.DEPLOYMENT/**", ".github/**"]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'ap-south-2' }}
+  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID || '117211782845' }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'fraud-ecomm-api' }}
+  EKS_CLUSTER: ${{ vars.EKS_CLUSTER || 'fraud-ecomm-eks' }}
+  MODEL_BUCKET: fraud-ecommerce
+  KUBECTL_VERSION: v1.35.8
+  PYTHON_VERSION: "3.13"
+
+jobs:
+  test:
+    name: test (arm64, no cloud credentials)
+    runs-on: ubuntu-24.04-arm
+    defaults:
+      run:
+        working-directory: 3.DEPLOYMENT
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: 3.DEPLOYMENT/requirements-dev.txt
+      - name: Install (exact pins)
+        run: python -m pip install -r requirements-dev.txt
+      - name: Pins equal the fixture's trained library versions
+        run: python scripts/check_pins.py --fixture-only
+      - name: Tests
+        run: python -m pytest -q -p no:cacheprovider tests
+
+  build:
+    name: build + push (native arm64)
+    needs: test
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+      digest: ${{ steps.push.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Pins equal the PROMOTED model's library versions
+        working-directory: 3.DEPLOYMENT
+        run: |
+          python -m pip install boto3==1.43.95
+          python scripts/check_pins.py
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - id: meta
+        name: Image reference (immutable git SHA)
+        run: |
+          expected="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          if [ "${{ steps.ecr.outputs.registry }}" != "$expected" ]; then
+            echo "::error::ECR registry ${{ steps.ecr.outputs.registry }} != expected $expected"; exit 1
+          fi
+          echo "image=${expected}/${ECR_REPOSITORY}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v4
+      - id: push
+        uses: docker/build-push-action@v7
+        with:
+          context: 3.DEPLOYMENT
+          file: 3.DEPLOYMENT/Dockerfile
+          platforms: linux/arm64
+          push: true
+          provenance: false
+          tags: |
+            ${{ steps.meta.outputs.image }}
+            ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+      - name: Read ECR scan-on-push findings (reported, not blocking)
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          status=""
+          for _ in $(seq 1 30); do
+            status=$(aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids imageDigest="$DIGEST" \
+                       --query 'imageDetails[0].imageScanStatus.status' --output text)
+            echo "scan status: $status"
+            case "$status" in COMPLETE|FAILED|UNSUPPORTED_IMAGE) break ;; esac
+            sleep 10
+          done
+          {
+            echo "### Image"
+            echo "- reference: \`${{ steps.meta.outputs.image }}\`"
+            echo "- digest: \`$DIGEST\`"
+            echo "### ECR scan ($status)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" = "COMPLETE" ]; then
+            aws ecr describe-image-scan-findings --repository-name "$ECR_REPOSITORY" --image-id imageDigest="$DIGEST" \
+              --query 'imageScanFindings.findingSeverityCounts' --output json | tee -a "$GITHUB_STEP_SUMMARY"
+            # shellcheck disable=SC2016  # backticks are JMESPath literals, not shell substitution
+            aws ecr describe-image-scan-findings --repository-name "$ECR_REPOSITORY" --image-id imageDigest="$DIGEST" \
+              --query 'imageScanFindings.findings[?severity==`CRITICAL`||severity==`HIGH`].[severity,name,attributes[?key==`package_name`].value|[0],attributes[?key==`package_version`].value|[0]]' \
+              --output text | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::ECR scan did not complete (status: ${status:-none}); review it in the console"
+          fi
+      - name: Trivy (reporting only; ghcr.io rate limits must not block a deploy)
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ steps.meta.outputs.image }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "0"
+          format: table
+
+  deploy:
+    name: deploy (render, verify, apply, auto-rollback)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: azure/setup-kubectl@v5
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+      - name: Select target environment
+        run: |
+          if [ "$GITHUB_REF" = "refs/heads/main" ]; then
+            echo "NAMESPACE=fraud-prod" >> "$GITHUB_ENV"; echo "MODEL_ALIAS_KEY=models/CURRENT.json" >> "$GITHUB_ENV"
+          else
+            echo "NAMESPACE=fraud-uat" >> "$GITHUB_ENV"; echo "MODEL_ALIAS_KEY=models/CURRENT_UAT.json" >> "$GITHUB_ENV"
+          fi
+      - name: Pre-flight (CI verifies infrastructure, it never creates it)
+        run: |
+          command -v envsubst > /dev/null || { echo "::error::envsubst missing on runner"; exit 1; }
+          aws eks describe-cluster --name "$EKS_CLUSTER" --query cluster.status --output text \
+            || { echo "::error::cluster $EKS_CLUSTER not found - create it with the runbook first"; exit 1; }
+          aws eks update-kubeconfig --name "$EKS_CLUSTER" --region "$AWS_REGION"
+          kubectl get namespace "$NAMESPACE" \
+            || { echo "::error::namespace $NAMESPACE missing - runbook IRSA step creates it"; exit 1; }
+          role=$(kubectl -n "$NAMESPACE" get serviceaccount fraud-api-sa -o jsonpath='{.metadata.annotations.eks\.amazonaws\.com/role-arn}') \
+            || { echo "::error::serviceaccount fraud-api-sa missing in $NAMESPACE - runbook IRSA step"; exit 1; }
+          [ -n "$role" ] || { echo "::error::fraud-api-sa has no IRSA role annotation"; exit 1; }
+          echo "IRSA role: $role"
+          aws s3api head-object --bucket "$MODEL_BUCKET" --key "$MODEL_ALIAS_KEY" > /dev/null \
+            || { echo "::error::s3://$MODEL_BUCKET/$MODEL_ALIAS_KEY missing - promote a model first (runbook)"; exit 1; }
+      - name: Render and verify manifests
+        env:
+          IMAGE: ${{ needs.build.outputs.image }}
+        run: bash .github/scripts/render_and_verify.sh 3.DEPLOYMENT/k8s _render
+      - name: Apply and wait (automatic rollback on failure)
+        run: |
+          kubectl apply -f _render
+          if ! kubectl -n "$NAMESPACE" rollout status deployment/fraud-api --timeout=420s; then
+            echo "::error::rollout failed - collecting evidence, then rolling back"
+            kubectl -n "$NAMESPACE" get pods -o wide
+            kubectl -n "$NAMESPACE" describe deployment fraud-api | tail -40
+            kubectl -n "$NAMESPACE" get events --sort-by=.lastTimestamp | tail -30
+            for p in $(kubectl -n "$NAMESPACE" get pods -l app=fraud-api -o name); do
+              echo "--- $p"
+              kubectl -n "$NAMESPACE" logs "$p" --tail=60 --all-containers \
+                || echo "(no logs available for $p - see the describe/events output above)"
+            done
+            kubectl -n "$NAMESPACE" rollout undo deployment/fraud-api
+            kubectl -n "$NAMESPACE" rollout status deployment/fraud-api --timeout=300s
+            exit 1
+          fi
+          kubectl -n "$NAMESPACE" get deployment fraud-api -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+          echo "- deployed \`${{ needs.build.outputs.image }}\` (digest \`${{ needs.build.outputs.digest }}\`) to \`$NAMESPACE\`" >> "$GITHUB_STEP_SUMMARY"
+
+  post_deploy:
+    name: post-deploy golden check (3rd parity point)
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: azure/setup-kubectl@v5
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Resolve the load balancer
+        run: |
+          ns=fraud-uat; [ "$GITHUB_REF" = "refs/heads/main" ] && ns=fraud-prod
+          aws eks update-kubeconfig --name "$EKS_CLUSTER" --region "$AWS_REGION"
+          host=""
+          for _ in $(seq 1 60); do
+            host=$(kubectl -n "$ns" get service fraud-api -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+            [ -n "$host" ] && break
+            sleep 10
+          done
+          [ -n "$host" ] || { echo "::error::no load balancer hostname after 10 minutes"; exit 1; }
+          echo "LB_HOST=$host" >> "$GITHUB_ENV"
+      - name: Golden payloads through the load balancer (stdlib only)
+        run: python 3.DEPLOYMENT/scripts/golden.py check --base-url "http://${LB_HOST}" --wait 600

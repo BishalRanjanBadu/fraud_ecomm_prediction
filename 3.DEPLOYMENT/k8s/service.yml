@@ -1,0 +1,12 @@
+# MARKER: fraud_phase2_v1 — one LoadBalancer per namespace (each one is billed separately)
+apiVersion: v1
+kind: Service
+metadata:
+  name: fraud-api
+  namespace: ${NAMESPACE}
+  labels: {app: fraud-api}
+spec:
+  type: LoadBalancer
+  selector: {app: fraud-api}
+  ports:
+    - {name: http, port: 80, targetPort: http}

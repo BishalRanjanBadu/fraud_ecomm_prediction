@@ -1,0 +1,196 @@
+{
+ "recorded_utc": "2026-09-18T00:33:13+00:00",
+ "recorded_against": "http://127.0.0.1:8000",
+ "model_version": "v_20260916T181427Z_nb93c753a",
+ "family": "lightgbm",
+ "service_version": "2.0.0",
+ "tolerance": 1e-06,
+ "cases": [
+  {
+   "name": "baseline:PAY0000553",
+   "status": 200,
+   "fraud_probability": 0.47368421052631576,
+   "score_raw": 0.44018066238059045,
+   "decision": true,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0000721",
+   "status": 200,
+   "fraud_probability": 0.005684754521963824,
+   "score_raw": 0.023577129279376618,
+   "decision": false,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0000992",
+   "status": 200,
+   "fraud_probability": 0.00011615750958299454,
+   "score_raw": 0.0007528956853664507,
+   "decision": false,
+   "defaults_applied": [
+    "acquisition_channel"
+   ],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0001056",
+   "status": 200,
+   "fraud_probability": 0.0,
+   "score_raw": 0.00027149170474747805,
+   "decision": false,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0001061",
+   "status": 200,
+   "fraud_probability": 0.8888888888888888,
+   "score_raw": 0.8908874665017529,
+   "decision": true,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0001110",
+   "status": 200,
+   "fraud_probability": 0.47368421052631576,
+   "score_raw": 0.4969265771816115,
+   "decision": true,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0001126",
+   "status": 200,
+   "fraud_probability": 0.0,
+   "score_raw": 0.0004231774516688358,
+   "decision": false,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0001186",
+   "status": 200,
+   "fraud_probability": 0.0,
+   "score_raw": 0.0004357078234061123,
+   "decision": false,
+   "defaults_applied": [
+    "payment_gateway"
+   ],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0001295",
+   "status": 200,
+   "fraud_probability": 0.005684754521963824,
+   "score_raw": 0.022227663851268425,
+   "decision": false,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0001558",
+   "status": 200,
+   "fraud_probability": 0.5,
+   "score_raw": 0.6452482415421206,
+   "decision": true,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0001569",
+   "status": 200,
+   "fraud_probability": 0.00011615750958299454,
+   "score_raw": 0.0004662338481677687,
+   "decision": false,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "baseline:PAY0001681",
+   "status": 200,
+   "fraud_probability": 0.0,
+   "score_raw": 0.00037890542046395686,
+   "decision": false,
+   "defaults_applied": [
+    "ip_country",
+    "ip_country_mismatch"
+   ],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "no_device_profile:PAY0003619",
+   "status": 200,
+   "fraud_probability": 0.00419407894736842,
+   "score_raw": 0.004512855008044618,
+   "decision": false,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "no_device_profile:PAY0004671",
+   "status": 200,
+   "fraud_probability": 0.00419407894736842,
+   "score_raw": 0.006533535254978707,
+   "decision": false,
+   "defaults_applied": [],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "cash_on_delivery:PAY0002088",
+   "status": 200,
+   "fraud_probability": 0.0,
+   "score_raw": 0.00030660456386625006,
+   "decision": false,
+   "defaults_applied": [
+    "acquisition_channel",
+    "payment_gateway"
+   ],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "kyc_missing:PAY0018069",
+   "status": 200,
+   "fraud_probability": 0.00011615750958299454,
+   "score_raw": 0.00047815213556209765,
+   "decision": false,
+   "defaults_applied": [
+    "kyc_level",
+    "shipping_addr_age_hours"
+   ],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  },
+  {
+   "name": "all_optional_null",
+   "status": 200,
+   "fraud_probability": 0.045454545454545456,
+   "score_raw": 0.047935333239681695,
+   "decision": false,
+   "defaults_applied": [
+    "account_age_days",
+    "acquisition_channel",
+    "address_match_flag",
+    "asn_type",
+    "attempt_seq_in_session",
+    "city_tier",
+    "discount_amount",
+    "home_region_code",
+    "ip_country",
+    "ip_country_mismatch",
+    "ip_region_code",
+    "ip_region_mismatch",
+    "item_count",
+    "kyc_level",
+    "prior_orders_12m",
+    "prior_return_rate",
+    "reputation_score",
+    "shipping_addr_age_hours",
+    "trailing_chargeback_rate_bps"
+   ],
+   "model_version": "v_20260916T181427Z_nb93c753a"
+  }
+ ]
+}

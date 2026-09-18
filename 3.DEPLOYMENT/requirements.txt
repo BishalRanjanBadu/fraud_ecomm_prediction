@@ -1,0 +1,17 @@
+# Runtime dependencies for the scoring image and the local dev environment. MARKER: fraud_phase2_v1
+# The first eight pins are the MODEL CONTRACT: they must equal the promoted manifest's library_versions
+# (scripts/check_pins.py enforces this in CI; the pod refuses readiness on a mismatch).
+pandas==2.2.3
+numpy==2.1.3
+scipy==1.16.3
+scikit-learn==1.6.1
+lightgbm==4.6.0
+# xgboost-cpu: the same xgboost 3.4.1 library core without the 252 MB NVIDIA NCCL dependency.
+# Needed because a Phase-3 retrain may switch model family (5% hysteresis); import name is `xgboost`.
+xgboost-cpu==3.4.1
+joblib==1.6.0
+boto3==1.43.95
+# service
+fastapi==0.141.1
+uvicorn==0.53.0
+pydantic==2.13.5

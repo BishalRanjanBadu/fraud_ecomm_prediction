@@ -1,0 +1,73 @@
+# MARKER: fraud_phase2_v1 — rendered by .github/scripts/render_and_verify.sh (variables: NAMESPACE, IMAGE, MODEL_ALIAS_KEY)
+# Slim single-node shape: 1 replica, zero-downtime rolling update (surge 1). A new pod whose model fails the
+# compatibility contract never becomes Ready, so the old pod keeps serving and CI rolls back (Part 0 #3/#4).
+# Canary is deferred on this single t4g.small node (documented deviation in the sign-off).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-api
+  namespace: ${NAMESPACE}
+  labels: {app: fraud-api}
+  annotations:
+    fraud/model-alias: "s3://fraud-ecommerce/${MODEL_ALIAS_KEY}"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  minReadySeconds: 10
+  progressDeadlineSeconds: 420
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxSurge: 1, maxUnavailable: 0}
+  selector:
+    matchLabels: {app: fraud-api}
+  template:
+    metadata:
+      labels: {app: fraud-api}
+    spec:
+      serviceAccountName: fraud-api-sa          # created by eksctl (IRSA); never defined in a manifest
+      nodeSelector:
+        kubernetes.io/arch: arm64               # the image is built for linux/arm64
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: api
+          image: ${IMAGE}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - {name: http, containerPort: 8000}
+          envFrom:
+            - configMapRef: {name: fraud-api-config}
+          env:
+            - {name: HOME, value: /tmp}         # must match the only writable mount below
+          resources:
+            requests: {cpu: 250m, memory: 384Mi}
+            limits: {memory: 768Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          startupProbe:                         # cold start: S3 download + unpickle + contract checks
+            httpGet: {path: /health, port: http}
+            periodSeconds: 5
+            failureThreshold: 36
+          readinessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:                        # process only, no I/O
+            httpGet: {path: /live, port: http}
+            periodSeconds: 20
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec: {command: ["/bin/sh", "-c", "sleep 5"]}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: tmp
+          emptyDir: {sizeLimit: 64Mi}

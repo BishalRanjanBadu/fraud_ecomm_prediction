@@ -1,0 +1,53 @@
+{
+ "marker": "fraud_phase2_v1",
+ "created_utc": "2026-09-18T00:29:30+00:00",
+ "bucket": "fraud-ecommerce",
+ "version": "v_20260916T181427Z_nb93c753a",
+ "family": "lightgbm",
+ "params": {
+  "colsample_bytree": 0.7475884550556351,
+  "learning_rate": 0.021648036763001914,
+  "min_child_samples": 225,
+  "n_estimators": 280,
+  "num_leaves": 50,
+  "reg_lambda": 0.005357280069601832,
+  "subsample": 0.902144564127061
+ },
+ "n_trees": 276,
+ "input_family": "tree",
+ "feature_hash": "64bfdc79b8649a156936c5cd2f2433d2db2df7a3c09a2168daf572acc4a9e6ba",
+ "library_versions": {
+  "python": "3.13.15",
+  "pandas": "2.2.3",
+  "numpy": "2.1.3",
+  "pyarrow": "23.0.1",
+  "scipy": "1.16.3",
+  "statsmodels": "0.15.0",
+  "sklearn": "1.6.1",
+  "lightgbm": "4.6.0",
+  "xgboost": "3.4.1",
+  "joblib": "1.6.0",
+  "boto3": "1.43.95"
+ },
+ "p06_sha256": "3efbdc4bc07b733ef4df01ea71a229f99f384af09fc9844b848fb737d03e66bd",
+ "p03_sha256": "4cc3901813f4b15990e0f7250d6756e2df338bb9fc23069f73b4d46cac0c7bb5",
+ "data_sha256": {
+  "data/02_cleaned.parquet": "1351ccfaffcf93dee3e87e37240029f2467b8ada7ba2d7fc8e2f6826d628cb07",
+  "data/06_encoded_tree.parquet": "267222203d8049ef505ef68540b168d8dc6fe886d382da64e4e8cc84a7404f8d",
+  "data/06_encoded_linear.parquet": "00b20758498d9c9d332c3c1a62f8fb49b73e787c87e79567e64aae41b36dee68"
+ },
+ "rows": 4000,
+ "positives": 1353,
+ "pool_rows": 7363,
+ "excluded": {},
+ "coverage": {
+  "fraud": 1353,
+  "cod": 458,
+  "no_card": 1790,
+  "card": 2210,
+  "no_device_profile": 255,
+  "no_basket": 43,
+  "no_prior_login": 1958
+ },
+ "parity_checked": true
+}

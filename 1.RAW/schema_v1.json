@@ -1,0 +1,1704 @@
+{
+ "contract_version": "v1",
+ "generated_by": "generate.py (SEED=42)",
+ "note": "Synthetic data. alerted_flag/payment_risk_score are incumbent-engine outputs, not ground truth. Ground truth is not shipped; it is observable only through fraud_events (biased), audit_sample (unbiased) and chargebacks (delayed).",
+ "tables": {
+  "KNOWN_DEFECTS.csv": {
+   "rows": 46,
+   "columns": [
+    {
+     "name": "table",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "account_logins.csv",
+      "cards.csv",
+      "customers.csv",
+      "devices.csv",
+      "order_items.csv",
+      "orders.csv",
+      "payments.csv"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "defect",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "MAR missingness",
+      "collinear-by-construction",
+      "duplicate identities",
+      "duplicate line items",
+      "exact duplicate rows",
+      "impossible value",
+      "inconsistent categories",
+      "integer stored as float",
+      "leading/trailing whitespace",
+      "missing/sentinel",
+      "mixed boolean encoding",
+      "mixed datetime formats",
+      "near-duplicate rows",
+      "numeric stored as formatted string",
+      "outlier",
+      "referential gap",
+      "test transactions",
+      "unsorted"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "column",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "rows",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 500000.0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "note",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 7,
+     "required_at_inference": false,
+     "post_decision": true
+    }
+   ]
+  },
+  "account_logins.csv": {
+   "rows": 180000,
+   "columns": [
+    {
+     "name": "login_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "customer_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "login_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "session_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "device_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "ip_address",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "ip_country",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "AE",
+      "BR",
+      "CN",
+      "DE",
+      "GB",
+      "IN",
+      "NG",
+      "RU",
+      "SG",
+      "US",
+      "VN"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "ip_asn",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "login_channel",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "App",
+      "Web",
+      "mWeb"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "auth_method",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Biometric",
+      "OTP",
+      "Password",
+      "SSO"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "new_device_flag",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 1.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "unusual_location_flag",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 1.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "failed_attempt_count",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 255.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "login_risk_score",
+     "dtype": "float64",
+     "nullable": true,
+     "null_count": 5614,
+     "min": 0.01,
+     "max": 86.24,
+     "required_at_inference": false,
+     "post_decision": false
+    }
+   ]
+  },
+  "audit_sample.csv": {
+   "rows": 12000,
+   "columns": [
+    {
+     "name": "audit_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "payment_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "sampled_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "review_completed_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "auditor_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "AU001",
+      "AU002",
+      "AU003",
+      "AU004",
+      "AU005",
+      "AU006",
+      "AU007",
+      "AU008",
+      "AU009",
+      "AU010",
+      "AU011",
+      "AU012",
+      "AU013",
+      "AU014",
+      "AU015",
+      "AU016",
+      "AU017",
+      "AU018",
+      "AU019",
+      "AU020",
+      "AU021",
+      "AU022",
+      "AU023",
+      "AU024"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "audit_verdict",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Fraud",
+      "Legitimate"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "audit_notes_code",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "NC01",
+      "NC02",
+      "NC03",
+      "NC10",
+      "NC11"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    }
+   ]
+  },
+  "cards.csv": {
+   "rows": 85264,
+   "columns": [
+    {
+     "name": "card_token",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "bin",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 400004.0,
+     "max": 659996.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "network",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Amex",
+      "Mastercard",
+      "RuPay",
+      "Visa"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "issuer",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 796,
+     "allowed": [
+      "AU Small Finance",
+      "Axis Bank",
+      "Bank of Baroda",
+      "Barclays",
+      "Capital One",
+      "Chase",
+      "Citibank NA",
+      "DBS",
+      "Federal Bank",
+      "HDFC Bank",
+      "ICICI Bank",
+      "IDFC First",
+      "IndusInd Bank",
+      "Kotak Mahindra",
+      "Maybank",
+      "N/A ",
+      "Punjab National Bank",
+      "Santander",
+      "Standard Chartered",
+      "State Bank of India",
+      "UNKNOWN BANK",
+      "Yes Bank"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "product_type",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 630,
+     "allowed": [
+      "Business",
+      "Classic",
+      "Gold",
+      "Platinum",
+      "Prepaid",
+      "Signature",
+      "UNKNOWN"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "issuing_country",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "AE",
+      "DE",
+      "GB",
+      "IN",
+      "SG",
+      "US"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "token_first_seen_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "is_prepaid",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 1.0,
+     "required_at_inference": false,
+     "post_decision": false
+    }
+   ]
+  },
+  "chargebacks.csv": {
+   "rows": 2466,
+   "columns": [
+    {
+     "name": "chargeback_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "payment_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "card_token",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "raised_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "resolution_timestamp",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 256,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "reason_code",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 10.4,
+     "max": 4837.0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "disputed_amount",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 36.93,
+     "max": 2133268.97,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "outcome",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Issuer Won",
+      "Merchant Won",
+      "Pending"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    }
+   ]
+  },
+  "customers.csv": {
+   "rows": 199600,
+   "columns": [
+    {
+     "name": "customer_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "signup_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "home_region_code",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 11.0,
+     "max": 85.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "home_pincode",
+     "dtype": "float64",
+     "nullable": true,
+     "null_count": 4397,
+     "min": 0.0,
+     "max": 859998.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "kyc_level",
+     "dtype": "float64",
+     "nullable": true,
+     "null_count": 1054,
+     "min": -1.0,
+     "max": 999.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "email_domain_class",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "\tcorporate",
+      "\tdisposable",
+      "\tmainstream",
+      "\tniche",
+      "  corporate",
+      "  disposable",
+      "  mainstream",
+      "  niche",
+      " corporate",
+      " disposable",
+      " mainstream",
+      " niche",
+      "corporate",
+      "corporate\t",
+      "corporate ",
+      "corporate  ",
+      "disposable",
+      "disposable\t",
+      "disposable ",
+      "disposable  ",
+      "mainstream",
+      "mainstream\t",
+      "mainstream ",
+      "mainstream  ",
+      "niche",
+      "niche\t",
+      "niche ",
+      "niche  "
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "acquisition_channel",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 1271,
+     "allowed": [
+      "Affiliate",
+      "Email",
+      "Organic",
+      "Paid Search",
+      "Referral",
+      "Social",
+      "UNKNOWN",
+      "other"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "city",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Ahmedabad",
+      "BENGALURU",
+      "Bangalore",
+      "Bengaluru",
+      "Bengaluru ",
+      "Bombay",
+      "CHENNAI",
+      "Calcutta",
+      "Chandigarh",
+      "Chennai",
+      "Delhi",
+      "HYDERABAD",
+      "Hyderabad",
+      "Indore",
+      "Jaipur",
+      "KOLKATA",
+      "Kochi",
+      "Kolkata",
+      "Lucknow",
+      "MUMBAI",
+      "Madras",
+      "Mumbai",
+      "Pune",
+      "Surat",
+      "bengaluru",
+      "hyderabad",
+      "mumbai"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "city_tier",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 1.0,
+     "max": 3.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "prior_return_rate",
+     "dtype": "float64",
+     "nullable": true,
+     "null_count": 4350,
+     "min": 0.0003,
+     "max": 0.9773,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "prior_orders_12m",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 899.0,
+     "required_at_inference": false,
+     "post_decision": false
+    }
+   ]
+  },
+  "devices.csv": {
+   "rows": 204567,
+   "columns": [
+    {
+     "name": "device_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "device_type",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Android Phone",
+      "Mac",
+      "Tablet",
+      "Windows Desktop",
+      "iPhone"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "os_family",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Android",
+      "Windows",
+      "iOS",
+      "macOS"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "browser_family",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 1626,
+     "allowed": [
+      "Chrome",
+      "Chrome Mobile",
+      "Edge",
+      "Firefox",
+      "Safari",
+      "Unknown",
+      "WebView",
+      "other"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "is_emulator",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 1.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "first_seen_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    }
+   ]
+  },
+  "fraud_events.csv": {
+   "rows": 5359,
+   "columns": [
+    {
+     "name": "fraud_event_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "payment_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "order_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "customer_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "alert_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "queued_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "decision_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "queue_name",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "ACCOUNT_RISK_Q",
+      "CARD_RISK_Q",
+      "GENERAL_Q"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "reviewer_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "alert_rule_codes",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "manual_review_flag",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "N",
+      "Y"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "action_status",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Blocked",
+      "Manual Review",
+      "Released"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "confirmed_fraud_flag",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "N",
+      "Y"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "fraud_loss_amount",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 595339.74,
+     "required_at_inference": false,
+     "post_decision": true
+    }
+   ]
+  },
+  "ip_reputation.csv": {
+   "rows": 238,
+   "columns": [
+    {
+     "name": "ip_asn",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "asn_name",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "asn_type",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Hosting",
+      "Mobile",
+      "Residential",
+      "VPN"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "is_hosting",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 1.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "asn_country",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "DE",
+      "IN",
+      "NL",
+      "RU",
+      "SG",
+      "US"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "reputation_score",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.13,
+     "max": 85.05,
+     "required_at_inference": false,
+     "post_decision": false
+    }
+   ]
+  },
+  "merchants.csv": {
+   "rows": 2000,
+   "columns": [
+    {
+     "name": "merchant_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "merchant_name",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "category",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Apparel",
+      "Beauty",
+      "Books",
+      "Electronics",
+      "Grocery",
+      "Home & Kitchen",
+      "Jewellery",
+      "Mobiles",
+      "Sports",
+      "Toys"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "mcc",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 4812.0,
+     "max": 5977.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "city",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Ahmedabad",
+      "Bengaluru",
+      "Chandigarh",
+      "Chennai",
+      "Delhi",
+      "Hyderabad",
+      "Indore",
+      "Jaipur",
+      "Kochi",
+      "Kolkata",
+      "Lucknow",
+      "Mumbai",
+      "Pune",
+      "Surat"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "onboarded_date",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "avg_ticket_size",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 556.72,
+     "max": 31685.42,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "trailing_chargeback_rate_bps",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.3,
+     "max": 92.7,
+     "required_at_inference": false,
+     "post_decision": false
+    }
+   ]
+  },
+  "order_items.csv": {
+   "rows": 1203841,
+   "columns": [
+    {
+     "name": "order_item_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "order_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "sku",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "category",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Apparel",
+      "Beauty",
+      "Books",
+      "Electronics",
+      "Grocery",
+      "Home & Kitchen",
+      "Jewellery",
+      "Mobiles",
+      "Sports",
+      "Toys"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "quantity",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 1.0,
+     "max": 3.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "unit_price",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 29.0,
+     "max": 1201600.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "line_amount",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 29.0,
+     "max": 2841456.48,
+     "required_at_inference": false,
+     "post_decision": false
+    }
+   ]
+  },
+  "orders.csv": {
+   "rows": 500000,
+   "columns": [
+    {
+     "name": "order_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "customer_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "order_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "item_count",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 1.0,
+     "max": 6.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "order_value",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 29.0,
+     "max": 5055907.42,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "discount_amount",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 362830.17,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "primary_category",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Apparel",
+      "Beauty",
+      "Books",
+      "Electronics",
+      "Grocery",
+      "Home & Kitchen",
+      "Jewellery",
+      "Mobiles",
+      "Sports",
+      "Toys"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "coupon_code",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 388651,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "shipping_speed",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "EXPRESS",
+      "Exp",
+      "Express",
+      "SAME_DAY",
+      "STANDARD",
+      "Same Day",
+      "SameDay",
+      "Scheduled",
+      "Standard",
+      "Std",
+      "express",
+      "same day",
+      "standard"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "shipping_charge",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 149.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "shipping_pincode",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 110001.0,
+     "max": 859998.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "billing_pincode",
+     "dtype": "float64",
+     "nullable": true,
+     "null_count": 14005,
+     "min": 110002.0,
+     "max": 859998.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "address_match_flag",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 1.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "shipping_addr_age_hours",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 7720,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "delivery_type",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "\tHome",
+      "\tLocker",
+      "\tPickup Point",
+      "  Home",
+      "  Locker",
+      "  Pickup Point",
+      " Home",
+      " Locker",
+      " Pickup Point",
+      "Home",
+      "Home\t",
+      "Home ",
+      "Home  ",
+      "Locker",
+      "Locker\t",
+      "Locker ",
+      "Locker  ",
+      "Pickup Point",
+      "Pickup Point\t",
+      "Pickup Point ",
+      "Pickup Point  "
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "order_value_inr",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 29.0,
+     "max": 5055907.42,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "net_payable",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 17.69,
+     "max": 5055907.42,
+     "required_at_inference": false,
+     "post_decision": false
+    }
+   ]
+  },
+  "payments.csv": {
+   "rows": 503400,
+   "columns": [
+    {
+     "name": "payment_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "order_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "customer_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "merchant_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "payment_timestamp",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "payment_method",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "CC",
+      "COD",
+      "CREDIT_CARD",
+      "Cash On Delivery",
+      "Cash on Delivery",
+      "Credit  Card",
+      "Credit Card",
+      "DC",
+      "DEBIT_CARD",
+      "Debit Card",
+      "EMI",
+      "NET_BANKING",
+      "Net Banking",
+      "Net banking",
+      "UPI",
+      "Upi",
+      "Wallet",
+      "cash on delivery",
+      "credit card",
+      "debit card",
+      "netbanking",
+      "upi"
+     ],
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "payment_gateway",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 62922,
+     "allowed": [
+      "Amazon Pay Gateway",
+      "BILLDESK",
+      "BillDesk",
+      "Billdesk",
+      "CashFree",
+      "Cashfree",
+      "PAYU",
+      "PayU",
+      "Payu",
+      "RAZORPAY",
+      "RazorPay",
+      "Razorpay",
+      "cashfree",
+      "payu",
+      "razorpay"
+     ],
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "card_token",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 314741,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "payment_amount",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 1,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "processing_fee",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 90779.23,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "payment_status",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "Failed",
+      "Success"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "failure_reason",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 486711,
+     "allowed": [
+      "Bank Declined",
+      "Card Expired",
+      "Gateway Timeout",
+      "Insufficient Funds",
+      "OTP Failed",
+      "UPI Timeout"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "device_id",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 6965,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "ip_address",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "ip_country",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 4057,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "ip_asn",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 3085,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "ip_region_code",
+     "dtype": "float64",
+     "nullable": true,
+     "null_count": 2080,
+     "min": -1.0,
+     "max": 99.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "session_id",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "attempt_seq_in_session",
+     "dtype": "float64",
+     "nullable": true,
+     "null_count": 2910,
+     "min": 1.0,
+     "max": 6.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "is_guest_checkout",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "0",
+      "1",
+      "FALSE",
+      "N",
+      "TRUE",
+      "Y"
+     ],
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "is_3ds_attempted",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "0",
+      "1",
+      "FALSE",
+      "N",
+      "TRUE",
+      "Y"
+     ],
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "is_3ds_success",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "0",
+      "1",
+      "FALSE",
+      "N",
+      "TRUE",
+      "Y"
+     ],
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "account_age_days_at_txn",
+     "dtype": "str",
+     "nullable": true,
+     "null_count": 1471,
+     "required_at_inference": true,
+     "post_decision": false
+    },
+    {
+     "name": "payment_risk_score",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.48,
+     "max": 99.12,
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "alerted_flag",
+     "dtype": "str",
+     "nullable": false,
+     "null_count": 0,
+     "allowed": [
+      "N",
+      "Y"
+     ],
+     "required_at_inference": false,
+     "post_decision": true
+    },
+    {
+     "name": "amount_usd",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.35,
+     "max": 60768.12,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "amount_paise",
+     "dtype": "int64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 2900.0,
+     "max": 505590742.0,
+     "required_at_inference": false,
+     "post_decision": false
+    },
+    {
+     "name": "fee_pct",
+     "dtype": "float64",
+     "nullable": false,
+     "null_count": 0,
+     "min": 0.0,
+     "max": 0.02736,
+     "required_at_inference": false,
+     "post_decision": false
+    }
+   ]
+  }
+ },
+ "payments_sha256_16": "16eccdb4376afbbe"
+}

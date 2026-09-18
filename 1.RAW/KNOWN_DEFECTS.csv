@@ -1,0 +1,47 @@
+table,defect,column,rows,note
+payments.csv,collinear-by-construction,amount_usd/amount_paise/fee_pct,500000,amount_usd = payment_amount/83.2 exactly; amount_paise = *100
+orders.csv,collinear-by-construction,order_value_inr/net_payable,500000,order_value_inr duplicates order_value; net_payable = value-discount+shipping
+payments.csv,mixed datetime formats,payment_timestamp,95244,ISO / space-separated / DD-MM-YYYY / ISO+offset
+account_logins.csv,mixed datetime formats,login_timestamp,34275,ISO / space-separated / DD-MM-YYYY / ISO+offset
+payments.csv,inconsistent categories,payment_method,49701,
+payments.csv,inconsistent categories,payment_gateway,48855,
+orders.csv,inconsistent categories,shipping_speed,53893,
+customers.csv,inconsistent categories,city,11244,includes legacy city names (Bombay/Calcutta/Madras/Bangalore)
+payments.csv,leading/trailing whitespace,ip_country,12676,
+customers.csv,leading/trailing whitespace,email_domain_class,4928,
+orders.csv,leading/trailing whitespace,delivery_type,12457,
+payments.csv,missing/sentinel,ip_country,10418,"sentinels: 'NA ','unknown','XX'"
+payments.csv,missing/sentinel,device_id,6925,blank
+payments.csv,missing/sentinel,ip_asn,9025,"sentinels: 'UNKNOWN','AS0'"
+payments.csv,missing/sentinel,ip_region_code,6014,"sentinels: '-1','99'"
+payments.csv,missing/sentinel,account_age_days_at_txn,4546,"sentinels: '-1','NaN '"
+payments.csv,missing/sentinel,attempt_seq_in_session,2885,"sentinels: '','null'"
+customers.csv,missing/sentinel,home_pincode,6467,"sentinels: '000000','NA'"
+customers.csv,missing/sentinel,kyc_level,3319,"sentinels: '-1','999'"
+customers.csv,missing/sentinel,acquisition_channel,3803,"sentinels: 'UNKNOWN','other'"
+customers.csv,missing/sentinel,prior_return_rate,4338,blank
+orders.csv,missing/sentinel,shipping_addr_age_hours,22914,"sentinels: 'NaN ','-1'"
+orders.csv,missing/sentinel,billing_pincode,14005,sentinels: ''
+cards.csv,missing/sentinel,issuer,2422,"sentinels: 'UNKNOWN BANK','N/A '"
+cards.csv,missing/sentinel,product_type,1267,sentinels: 'UNKNOWN'
+account_logins.csv,missing/sentinel,login_risk_score,5614,blank
+devices.csv,missing/sentinel,browser_family,4822,"sentinels: 'Unknown','other'"
+payments.csv,MAR missingness,ip_country,1466,geo lookup fails more often on hosting/VPN ASNs — missingness is informative
+payments.csv,numeric stored as formatted string,payment_amount,2938,"e.g. ""1,234.50"" — forces object dtype on the whole column"
+payments.csv,mixed boolean encoding,is_3ds_attempted,110361,1/0 mixed with Y/N and TRUE/FALSE
+payments.csv,mixed boolean encoding,is_3ds_success,110200,1/0 mixed with Y/N and TRUE/FALSE
+payments.csv,mixed boolean encoding,is_guest_checkout,109690,1/0 mixed with Y/N and TRUE/FALSE
+cards.csv,integer stored as float,bin,85264,BIN reads as 412345.0
+payments.csv,impossible value,payment_amount,240,negative amounts — refund rows mis-ingested into the payment stream
+payments.csv,impossible value,payment_amount,150,zero-value payments
+payments.csv,test transactions,payment_amount,60,internal test rows: absurd amounts on a single sentinel customer
+payments.csv,impossible value,account_age_days_at_txn,420,100-year-old accounts
+account_logins.csv,impossible value,failed_attempt_count,300,uint8 overflow sentinel
+customers.csv,outlier,prior_orders_12m,800,"wholesale/reseller accounts — genuine, must NOT be capped away"
+payments.csv,exact duplicate rows,*,2000,double-submitted webhook deliveries — safe to drop
+payments.csv,near-duplicate rows,payment_id,1400,"genuine retries: same customer/amount seconds apart, distinct payment_id. Dropping these blindly destroys the retry signal"
+order_items.csv,duplicate line items,*,2600,
+customers.csv,duplicate identities,customer_id,600,"same person re-registered; suffixed id, otherwise identical attributes"
+payments.csv,referential gap,device_id,900,device ids absent from devices.csv — fingerprint service outage window
+order_items.csv,referential gap,order_id,380,orders with zero line items
+payments.csv,unsorted,*,0,rows are not in timestamp or id order — a naive index split is not a temporal split

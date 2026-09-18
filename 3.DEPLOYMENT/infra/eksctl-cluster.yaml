@@ -1,0 +1,56 @@
+# MARKER: fraud_phase2_v1 — one-time cluster creation (CI never creates infrastructure; it only verifies it).
+#   eksctl create cluster -f infra/eksctl-cluster.yaml
+# Cost while it exists: EKS control plane ~USD 0.10/hour (~USD 73/month, never free tier) + LoadBalancer
+# + EBS volume. t4g.small is free-tier eligible in ap-south-2 (verified in your account on 2026-09-17).
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: fraud-ecomm-eks
+  region: ap-south-2
+  version: "1.35"              # highest version eksctl 0.230.0 supports; in EKS standard support
+iam:
+  withOIDC: true               # required for IRSA (eksctl does NOT enable it by default)
+  serviceAccounts:
+    - metadata:
+        name: fraud-api-sa
+        namespace: fraud-prod
+      attachPolicy:            # read-only, models/ prefix only (the pod never writes in Phase 2)
+        Version: "2012-10-17"
+        Statement:
+          - Sid: ReadModelArtifacts
+            Effect: Allow
+            Action: ["s3:GetObject"]
+            Resource: ["arn:aws:s3:::fraud-ecommerce/models/*"]
+          - Sid: ListModelPrefix
+            Effect: Allow
+            Action: ["s3:ListBucket"]
+            Resource: ["arn:aws:s3:::fraud-ecommerce"]
+            Condition:
+              StringLike:
+                s3:prefix: ["models/*"]
+    - metadata:                # UAT stays dormant (no Deployment, no LoadBalancer) until a develop branch is pushed
+        name: fraud-api-sa
+        namespace: fraud-uat
+      attachPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: ReadModelArtifacts
+            Effect: Allow
+            Action: ["s3:GetObject"]
+            Resource: ["arn:aws:s3:::fraud-ecommerce/models/*"]
+          - Sid: ListModelPrefix
+            Effect: Allow
+            Action: ["s3:ListBucket"]
+            Resource: ["arn:aws:s3:::fraud-ecommerce"]
+            Condition:
+              StringLike:
+                s3:prefix: ["models/*"]
+managedNodeGroups:
+  - name: ng-arm-small
+    instanceType: t4g.small
+    amiFamily: AmazonLinux2023
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 1
+    volumeSize: 20
+    labels: {workload: fraud-api}

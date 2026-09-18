@@ -1,0 +1,10 @@
+# MARKER: fraud_phase2_v1 — with 1 replica, maxUnavailable (not minAvailable) so node drains are not blocked
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fraud-api
+  namespace: ${NAMESPACE}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels: {app: fraud-api}

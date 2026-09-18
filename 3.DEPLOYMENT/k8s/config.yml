@@ -1,0 +1,16 @@
+# MARKER: fraud_phase2_v1 — rendered by .github/scripts/render_and_verify.sh (variables: NAMESPACE, MODEL_ALIAS_KEY)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fraud-api-config
+  namespace: ${NAMESPACE}
+  labels: {app: fraud-api}
+data:
+  MODEL_BUCKET: "fraud-ecommerce"
+  AWS_REGION: "ap-south-2"
+  MODEL_ALIAS_KEY: "${MODEL_ALIAS_KEY}"
+  LOG_LEVEL: "INFO"
+  LOG_PREDICTIONS: "false"     # Phase 3 flips this together with s3:PutObject on predictions/
+  ROLE: "api"
+  PORT: "8000"
+  OMP_NUM_THREADS: "2"         # t4g.small has 2 vCPUs
