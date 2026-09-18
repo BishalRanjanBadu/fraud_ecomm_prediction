@@ -8,7 +8,7 @@
 | **Notebook package** | `fraud_nb01-07_v2` (notebooks 01–07, outputs stripped in the repo) |
 | **Candidate model** | `v_20260916T181427Z_nb93c753a` |
 | **Promotion state** | `models/CURRENT.json` not yet written. Promotion is a Phase-2 runbook step, done after this record is committed. |
-| **Code reference** | git SHA: *to be recorded at first push* |
+| **Code reference** | git SHA: 596b00c4e45aa5d851672ff030a9c9cf9d5de152 (first commit containing 2.RUNNING_CODE_FILES/) |
 | **Rendered** | 2026-09-17T02:24:13+00:00 by `render_phase1_signoff.py` from S3 (as-run values only) |
 
 ## 1. What was reviewed
